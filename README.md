@@ -24,7 +24,7 @@ mruby WASI
 
 > Ruby's exception will lead crash
 
-`ASYNCIFY=1 rake`
+`rake`
 
 ## Play
 
