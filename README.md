@@ -47,7 +47,8 @@ mruby WASI
 ## References
 
 - https://eng-blog.iij.ad.jp/archives/10875
-- https://github.com/ruby/ruby/tree/master/wasm
+- https://itnext.io/final-report-webassembly-wasi-support-in-ruby-4aface7d90c9
+  - https://github.com/ruby/ruby/tree/master/wasm
 
 ## License
 
