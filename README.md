@@ -13,6 +13,7 @@ mruby WASI
 - You must set `WASI_SDK_PATH` env
   - e.g. `export WASI_SDK_PATH="~/opt/wasi-sdk-14.0"`
 - You may need run `rake mrproper` before switch build
+- Don't forget `git submodule update --init` to fetch submodules
 
 ### Build with `Asyncify`
 
