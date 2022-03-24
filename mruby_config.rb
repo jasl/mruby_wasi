@@ -26,6 +26,7 @@ MRuby::CrossBuild.new("wasm32-wasi") do |conf|
   toolchain :clang
 
   conf.gem "mruby-wasi-support"
+  # conf.gem "mruby-wasi-stub"
   conf.gembox GEMBOX
 
   # Generate mruby commands

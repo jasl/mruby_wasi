@@ -1,6 +1,6 @@
 MRuby::GemBox.new do |conf|
   conf.gem "mruby-io"
-  conf.gem core: "mruby-print" # Dev usage
+  conf.gem core: "mruby-print"
 
   # conf.gem "mruby-mpdecimal" # Not support WASM
   # conf.gem "mruby-msgpack"
