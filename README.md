@@ -3,30 +3,43 @@ mruby WASI
 
 ## Requirements
 
+- CRuby 2.6+
 - https://github.com/WebAssembly/wasi-sdk
 - https://github.com/WebAssembly/binaryen
 
 ## Compile
 
-`rake`
+**Note: You need `rake mrproper` before switch build**
 
-### if build with `Asyncify`
+### build with `Asyncify`
+
+`ASYNCIFY=1 rake`
 
 `wasm-opt -g --asyncify -O3 --pass-arg=asyncify-ignore-imports -o bin/mruby.wasm mruby/build/wasm32-unknown-wasi/bin/mruby.wasm`
+
+### not build with `Asyncify`
+
+> Ruby's exception will lead crash
+
+`ASYNCIFY=1 rake`
 
 ## Play
 
 ### if build with `Asyncify`
 
+> Weird no output
+
 `wasmtime run bin/mruby.wasm -- -e 'puts "Hello, mruby on WASI!"'`
 
 ### if build without `Asyncify`
+
+> TODO: Copy executable to `bin` folder
 
 `wasmtime run mruby/build/wasm32-unknown-wasi/bin/mruby.wasm -- -e 'puts "Hello, mruby on WASI!"'`
 
 ## Limitation
 
-- Doesn't support C++
+- Doesn't support C++ exception
 
 ## References
 
