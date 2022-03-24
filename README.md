@@ -5,7 +5,7 @@ mruby WASI
 
 - CRuby 2.6+
 - https://github.com/WebAssembly/wasi-sdk
-- `wasm-opt` from https://github.com/WebAssembly/binaryen
+- https://github.com/WebAssembly/binaryen
 
 ## Build
 
@@ -16,9 +16,15 @@ mruby WASI
 
 ### Build with `Asyncify`
 
+Build mruby
+
 `ASYNCIFY=1 rake`
 
+Run `wasm-opt` (from Binaryen)
+
 `wasm-opt -g --asyncify -O3 --pass-arg=asyncify-ignore-imports -o bin/mruby.wasm mruby/build/wasm32-unknown-wasi/bin/mruby.wasm`
+
+> Disable optimization may lead error `Invalid input WebAssembly code at offset 2464055: locals exceed`
 
 ### Build without `Asyncify`
 
@@ -28,9 +34,11 @@ mruby WASI
 
 ## Play
 
+> First time run may take minutes
+
 ### if build with `Asyncify`
 
-> Weird no output
+> TODO: Weird there's no output
 
 `wasmtime run bin/mruby.wasm -- -e 'puts "Hello, mruby on WASI!"'`
 
