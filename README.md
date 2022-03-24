@@ -6,18 +6,21 @@ mruby WASI
 - CRuby 2.6+
 - https://github.com/WebAssembly/wasi-sdk
 - https://github.com/WebAssembly/binaryen
+  - `wasm-opt`
 
-## Compile
+## Build
 
-**Note: You need `rake mrproper` before switch build**
+- You must set `WASI_SDK_PATH` env
+  - e.g. `export WASI_SDK_PATH="~/opt/wasi-sdk-14.0"`
+- You may need run `rake mrproper` before switch build
 
-### build with `Asyncify`
+### Build with `Asyncify`
 
 `ASYNCIFY=1 rake`
 
 `wasm-opt -g --asyncify -O3 --pass-arg=asyncify-ignore-imports -o bin/mruby.wasm mruby/build/wasm32-unknown-wasi/bin/mruby.wasm`
 
-### not build with `Asyncify`
+### Build without `Asyncify`
 
 > Ruby's exception will lead crash
 
