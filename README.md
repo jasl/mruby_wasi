@@ -5,14 +5,13 @@ mruby WASI
 
 - CRuby 2.6+
 - https://github.com/WebAssembly/wasi-sdk
-- https://github.com/WebAssembly/binaryen
-  - `wasm-opt`
+- `wasm-opt` from https://github.com/WebAssembly/binaryen
 
 ## Build
 
 - You must set `WASI_SDK_PATH` env
   - e.g. `export WASI_SDK_PATH="~/opt/wasi-sdk-14.0"`
-- You may need run `rake mrproper` before switch build
+- You may need run `rake mrproper` before switching build
 - Don't forget `git submodule update --init` to fetch submodules
 
 ### Build with `Asyncify`
