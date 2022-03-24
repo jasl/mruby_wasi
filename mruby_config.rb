@@ -6,8 +6,8 @@ WASI_SDK_PATH = Pathname.new(File.expand_path(ENV['WASI_SDK_PATH'] || fail('Spec
 SYSROOT_PATH = WASI_SDK_PATH.join("share", "wasi-sysroot").realpath.to_s
 
 CC = WASI_SDK_PATH.join("bin", "clang").realpath.to_s
-LD = WASI_SDK_PATH.join("bin", "wasm-ld").realpath.to_s
-AR = WASI_SDK_PATH.join("bin", "llvm-ar").realpath.to_s
+LLD = WASI_SDK_PATH.join("bin", "clang").realpath.to_s
+AR = WASI_SDK_PATH.join("bin", "ar").realpath.to_s
 
 PROJECT_ROOT_PATH = Pathname.new(__dir__)
 GEMBOX =
@@ -18,30 +18,20 @@ GEMBOX =
   else
     PROJECT_ROOT_PATH.join("mruby_engine")
   end
-WASM_EXT_PATH = PROJECT_ROOT_PATH.join("mruby_ext").realpath.to_s
+WASM_EXT_INCLUDE_PATH = PROJECT_ROOT_PATH.join("mruby-wasi-support", "include").realpath.to_s
 
 # https://github.com/mruby/mruby/blob/master/doc/guides/compile.md
 
 MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   toolchain :clang
 
+  conf.gem "mruby-wasi-support"
   conf.gembox GEMBOX
 
   # Generate mruby commands
   conf.gem core: "mruby-bin-mruby"
-  # conf.gem core: "mruby-bin-mirb"
   conf.gem core: "mruby-bin-mrbc"
-
-# TODO：Add mruby_ext .c .s to src, this cheated from a mrbgem
-#   objs = %w[codegen y.tab].map do |name|
-#     src = "#{dir}/core/#{name}.c"
-#     if build.cxx_exception_enabled?
-#       build.compile_as_cxx(src)
-#     else
-#       objfile(src.pathmap("#{build_dir}/core/%n"))
-#     end
-#   end
-#   build.libmruby_core_objs << objs
+  # conf.gem core: "mruby-bin-mirb"
 
   conf.cc do |cc|
     cc.command = CC
@@ -50,9 +40,7 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
       "-Wall",
       "-Wextra"
     ]
-    cc.include_paths.unshift(*[
-      WASM_EXT_PATH
-    ])
+    # cc.include_paths += [WASM_EXT_INCLUDE_PATH]
     cc.defines += %w[]
     cc.option_include_path = %q[-I"%s"]
     cc.option_define = "-D%s"
@@ -60,14 +48,14 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   end
 
   conf.linker do |linker|
-    linker.command = LD
+    linker.command = LLD
     linker.flags = ['--verbose']
     linker.flags_before_libraries = []
     linker.libraries = %w[c clang_rt.builtins-wasm32]
     linker.flags_after_libraries = []
     linker.library_paths = [
-      WASI_SDK_PATH.join("share", "wasi-sysroot", "lib", "wasm32-wasi"),
-      WASI_SDK_PATH.join("lib", "clang", "13.0.0", "lib", "wasi")
+      WASI_SDK_PATH.join("share", "wasi-sysroot", "lib", "wasm32-wasi").to_s,
+      WASI_SDK_PATH.join("lib", "clang", "13.0.0", "lib", "wasi").to_s
     ]
     linker.option_library = '-l%s'
     linker.option_library_path = '-L%s'

@@ -29,8 +29,10 @@ typedef struct {
 } rb_wasm_jmp_buf;
 
 // noinline to avoid breaking Asyncify assumption
-NOINLINE(int _rb_wasm_setjmp(rb_wasm_jmp_buf *env));
-NOINLINE(void _rb_wasm_longjmp(rb_wasm_jmp_buf *env, int payload));
+//NOINLINE(int _rb_wasm_setjmp(rb_wasm_jmp_buf *env));
+//NOINLINE(void _rb_wasm_longjmp(rb_wasm_jmp_buf *env, int payload));
+__attribute__((noinline)) int _rb_wasm_setjmp(rb_wasm_jmp_buf *env);
+__attribute__((noinline)) void _rb_wasm_longjmp(rb_wasm_jmp_buf *env, int payload);
 
 #define rb_wasm_setjmp(env) ((env).state = 0, _rb_wasm_setjmp(&(env)))
 

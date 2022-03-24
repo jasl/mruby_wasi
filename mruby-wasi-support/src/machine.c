@@ -1,6 +1,6 @@
 #include <stdlib.h>
-#include "include/machine.h"
-#include "include/asyncify.h"
+#include "machine.h"
+#include "asyncify.h"
 
 #ifndef WASM_SCAN_STACK_BUFFER_SIZE
 # define WASM_SCAN_STACK_BUFFER_SIZE 6144

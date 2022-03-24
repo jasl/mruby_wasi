@@ -23,8 +23,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "include/asyncify.h"
-#include "include/setjmp.h"
+#include "asyncify.h"
+#include "setjmp.h"
 
 #ifdef RB_WASM_ENABLE_DEBUG_LOG
 # include <stdio.h>
