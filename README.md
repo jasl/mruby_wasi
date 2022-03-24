@@ -10,13 +10,23 @@ mruby WASI
 
 `rake`
 
-### if enabled
+### if build with `Asyncify`
 
 `wasm-opt -g --asyncify -O3 --pass-arg=asyncify-ignore-imports -o bin/mruby.wasm mruby/build/wasm32-unknown-wasi/bin/mruby.wasm`
 
 ## Play
 
+### if build with `Asyncify`
+
 `wasmtime run bin/mruby.wasm -- -e 'puts "Hello, mruby on WASI!"'`
+
+### if build without `Asyncify`
+
+`wasmtime run mruby/build/wasm32-unknown-wasi/bin/mruby.wasm -- -e 'puts "Hello, mruby on WASI!"'`
+
+## Limitation
+
+- Doesn't support C++
 
 ## References
 

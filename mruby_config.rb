@@ -20,14 +20,20 @@ GEMBOX =
     PROJECT_ROOT_PATH.join("mruby_engine")
   end
 
+ASYNCIFY = ENV["ASYNCIFY"].to_i == 1
+
 # https://github.com/mruby/mruby/blob/master/doc/guides/compile.md
 
 MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   toolchain :clang
 
-  conf.gem "mruby-wasi-asyncify-compilable" # with Asyncify
-  # conf.gem "mruby-wasi-compilable" # without Asyncify
   conf.gembox GEMBOX
+
+  if ASYNCIFY
+    conf.gem "mruby-wasi-asyncify-compilable"
+  else
+    conf.gem "mruby-wasi-compilable"
+  end
 
   # Generate mruby commands
   conf.gem core: "mruby-bin-mruby"
