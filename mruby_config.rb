@@ -22,100 +22,86 @@ GEMBOX =
 
 # https://github.com/mruby/mruby/blob/master/doc/guides/compile.md
 
-MRuby::CrossBuild.new("wasm32-wasi") do |conf|
+MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   toolchain :clang
 
-  conf.gem "mruby-wasi-support"
-  # conf.gem "mruby-wasi-stub"
+  conf.gem "mruby-wasi-asyncify-compilable" # with Asyncify
+  # conf.gem "mruby-wasi-compilable" # without Asyncify
   conf.gembox GEMBOX
 
   # Generate mruby commands
   conf.gem core: "mruby-bin-mruby"
-  # conf.gem core: "mruby-bin-mrbc"
   # conf.gem core: "mruby-bin-mirb"
 
   # Turn on `enable_debug` for better debugging
-#   conf.enable_debug
-#   conf.enable_cxx_abi
-#   conf.enable_test
+  conf.enable_debug
+  # conf.enable_test
 
-  conf.exts do |exts|
-    # exts.object = ".o"
-    exts.executable = ".wasm"
-    # exts.library = ".bc" # It's LLVM bit code
+  conf.cc do |cc|
+    cc.command = cxx_abi_enabled? ? CXX : CC
+    cc.flags = [
+      cxx_abi_enabled? ? "-xc++" : "",
+      cxx_abi_enabled? ? "-std=c++11" : "-std=c99",
+      "--sysroot=#{SYSROOT_PATH}",
+      "--target=wasm32-wasi",
+      "-m32",
+      "-flto",
+      "-O3",
+      "-Wall",
+      "-Wextra",
+    ]
+    cc.defines += %w[
+      MRB_USE_DEBUG_HOOK
+      MRB_UTF8_STRING
+      MRB_WORD_BOXING
+      MRB_WORDBOX_NO_FLOAT_TRUNCATE
+      MRB_USE_RO_DATA_P_ETEXT
+    ]
   end
+
+  # # WASI doesn't support C++ exception yet, so this can't enable
+  # conf.enable_cxx_abi
+  # conf.cxx do |cxx|
+  #   cxx.command = CXX
+  #   cxx.flags = [
+  #     "-std=c++11",
+  #     "--sysroot=#{SYSROOT_PATH}",
+  #     "--target=wasm32-wasi",
+  #     # "-m32",
+  #     # "-flto",
+  #     # "-O3",
+  #     # "-Wall",
+  #     # "-Wextra",
+  #   ]
+  #   cxx.defines += %w[
+  #     MRB_USE_DEBUG_HOOK
+  #     MRB_UTF8_STRING
+  #     MRB_WORD_BOXING
+  #     MRB_WORDBOX_NO_FLOAT_TRUNCATE
+  #     MRB_USE_RO_DATA_P_ETEXT
+  #   ]
+  # end
 
   conf.asm do |as|
     as.command = cxx_abi_enabled? ? CXX : CC
     as.flags = ["-fno-integrated-as"]
   end
 
-  conf.cc do |cc|
-    cc.command = CC
-    cc.flags = [
-      "--sysroot=#{SYSROOT_PATH}",
-      "-fPIC",
-      "-m32",
-      "-Wall",
-      "-Wextra"
-    ]
-    cc.defines += %w[MRB_USE_DEBUG_HOOK MRB_UTF8_STRING MRB_WORD_BOXING]
-    # cc.option_include_path = %q[-I"%s"]
-    # cc.option_define = "-D%s"
-    # cc.compile_options = %Q[%{flags} -MMD -o "%{outfile}" -c "%{infile}"]
-  end
-
-  conf.cxx do |cxx|
-    cxx.command = CXX
-    cxx.flags = [
-      "--sysroot=#{SYSROOT_PATH}",
-      "-fPIC",
-      "-m32",
-      "-Wall",
-      "-Wextra"
-    ]
-    cc.defines += %w[MRB_USE_DEBUG_HOOK MRB_UTF8_STRING MRB_WORD_BOXING]
-    # cxx.option_include_path = %q[-I"%s"]
-    # cxx.option_define = "-D%s"
-    # cxx.compile_options = %Q[%{flags} -MMD -o "%{outfile}" -c "%{infile}"]
-  end
-
   conf.linker do |linker|
     linker.command = LLD
-    linker.flags = %w[
-      --verbose
-      -m32
-      -flto
+    linker.flags = [
+      "-Wl,--lto-O3",
+      "--verbose",
     ]
-#     linker.flags_before_libraries = []
-    linker.libraries = %w[c clang_rt.builtins-wasm32]
-#     linker.flags_after_libraries = []
-    linker.library_paths = [
-      WASI_SDK_PATH.join("share", "wasi-sysroot", "lib", "wasm32-wasi").to_s,
-      WASI_SDK_PATH.join("lib", "clang", "13.0.0", "lib", "wasi").to_s
-    ]
-#     linker.option_library = '-l%s'
-#     linker.option_library_path = '-L%s'
-#     linker.link_options = "%{flags} -o '%{outfile}' '#{WASI_SDK_PATH}/share/wasi-sysroot/lib/wasm32-wasi/crt1.o' %{objs} %{libs}"
   end
 
   conf.archiver do |archiver|
     archiver.command = AR
-    # archiver.archive_options = 'vrs "%{outfile}" %{objs}'
   end
+
+  conf.exts.executable = ".wasm"
 
   conf.test_runner do |t|
     t.command = 'wasmtime'
   end
-
-#   conf.cc do |cc|
-#     cc.flags += %w[-fPIC]
-#     cc.flags += Flags.wasm32_cflags
-#     cc.defines += Flags.wasm32_defines
-#   end
-#
-#   conf.linker do |linker|
-#     linker.flags += Flags.wasm32_linker_flags
-#     # linker.library_paths += Flags.library_paths
-#   end
 end

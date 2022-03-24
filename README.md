@@ -9,7 +9,10 @@ mruby WASI
 ## Compile
 
 `rake`
-`wasm-opt -g --asyncify -O3 --pass-arg=asyncify-ignore-imports -o bin/mruby.wasm mruby/build/wasm32-wasi/bin/mruby.wasm`
+
+### if enabled
+
+`wasm-opt -g --asyncify -O3 --pass-arg=asyncify-ignore-imports -o bin/mruby.wasm mruby/build/wasm32-unknown-wasi/bin/mruby.wasm`
 
 ## Play
 
