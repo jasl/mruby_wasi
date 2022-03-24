@@ -50,13 +50,14 @@ Run `wasm-opt` (from Binaryen)
 
 ## Limitation
 
-- `enable_cxx_abi` will fail because WASI lacking C++ exception support
+- `enable_cxx_exception` will fail because WASI lacking C++ exception support
 
 ## References
 
 - https://eng-blog.iij.ad.jp/archives/10875
 - https://itnext.io/final-report-webassembly-wasi-support-in-ruby-4aface7d90c9
   - https://github.com/ruby/ruby/tree/master/wasm
+- https://github.com/kripken/talks/blob/master/jmp.c
 
 ## License
 
