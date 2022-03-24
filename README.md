@@ -39,7 +39,7 @@ mruby WASI
 
 ## Limitation
 
-- Doesn't support C++ exception
+- `enable_cxx_abi` will fail because WASI lacking C++ exception support
 
 ## References
 
