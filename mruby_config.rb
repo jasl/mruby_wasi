@@ -60,8 +60,8 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
     ]
   end
 
-  # # WASI doesn't support C++ exception yet, so this can't enable
   # conf.enable_cxx_abi
+  # conf.disable_cxx_exception # WASI doesn't support C++ exception yet, so this must be enabled
   # conf.cxx do |cxx|
   #   cxx.command = CXX
   #   cxx.flags += [
