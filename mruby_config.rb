@@ -82,6 +82,13 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   conf.asm do |as|
     as.command = cxx_abi_enabled? ? CXX : CC
     as.flags += ["--target=wasm32-wasi"]
+    cc.defines += %w[
+      MRB_USE_DEBUG_HOOK
+      MRB_UTF8_STRING
+      MRB_WORD_BOXING
+      MRB_WORDBOX_NO_FLOAT_TRUNCATE
+      MRB_USE_RO_DATA_P_ETEXT
+    ]
   end
 
   conf.linker do |linker|
@@ -101,4 +108,24 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   conf.test_runner do |t|
     t.command = 'wasmtime'
   end
+
+  puts "================================================"
+  puts "CC flags"
+  puts conf.cc.flags.compact.join(", ")
+  puts "CC Defines"
+  puts conf.cc.defines.compact.join(", ")
+
+  puts "CXX flags"
+  puts conf.cxx.flags.compact.join(", ")
+  puts "CXX Defines"
+  puts conf.cxx.defines.compact.join(", ")
+
+  puts "ASM flags"
+  puts conf.asm.flags.compact.join(", ")
+  puts "ASM Defines"
+  puts conf.asm.defines.compact.join(", ")
+
+  puts "Linker flags"
+  puts conf.linker.flags.compact.join(", ")
+  puts "================================================"
 end
