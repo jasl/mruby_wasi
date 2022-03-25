@@ -52,6 +52,10 @@ Run `wasm-opt` (from Binaryen)
 
 - `enable_cxx_exception` will fail because WASI lacking C++ exception support
 
+## Debugging
+
+See https://docs.wasmtime.dev/examples-debugging.html
+
 ## References
 
 - https://eng-blog.iij.ad.jp/archives/10875
