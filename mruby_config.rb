@@ -82,7 +82,7 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   conf.asm do |as|
     as.command = cxx_abi_enabled? ? CXX : CC
     as.flags += ["--target=wasm32-wasi"]
-    cc.defines += %w[
+    as.defines += %w[
       MRB_USE_DEBUG_HOOK
       MRB_UTF8_STRING
       MRB_WORD_BOXING
@@ -110,22 +110,22 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   end
 
   puts "================================================"
-  puts "CC flags"
-  puts conf.cc.flags.compact.join(", ")
-  puts "CC Defines"
-  puts conf.cc.defines.compact.join(", ")
+  puts "CC flags:"
+  puts conf.cc.flags.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
+  puts "CC defines:"
+  puts conf.cc.defines.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
 
-  puts "CXX flags"
-  puts conf.cxx.flags.compact.join(", ")
-  puts "CXX Defines"
-  puts conf.cxx.defines.compact.join(", ")
+  puts "CXX flags:"
+  puts conf.cxx.flags.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
+  puts "CXX defines:"
+  puts conf.cxx.defines.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
 
-  puts "ASM flags"
-  puts conf.asm.flags.compact.join(", ")
-  puts "ASM Defines"
-  puts conf.asm.defines.compact.join(", ")
+  puts "ASM flags:"
+  puts conf.asm.flags.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
+  puts "ASM defines:"
+  puts conf.asm.defines.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
 
-  puts "Linker flags"
-  puts conf.linker.flags.compact.join(", ")
+  puts "Linker flags:"
+  puts conf.linker.flags.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
   puts "================================================"
 end
