@@ -45,16 +45,11 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
 
   conf.cc do |cc|
     cc.command = cxx_abi_enabled? ? CXX : CC
-    cc.flags = [
-      cxx_abi_enabled? ? "-xc++" : "",
-      cxx_abi_enabled? ? "-std=c++11" : "-std=c99",
+    cc.flags += [
       "--sysroot=#{SYSROOT_PATH}",
       "--target=wasm32-wasi",
       "-m32",
       "-flto",
-      "-O3",
-      "-Wall",
-      "-Wextra",
     ]
     cc.defines += %w[
       MRB_USE_DEBUG_HOOK
@@ -69,15 +64,11 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   # conf.enable_cxx_abi
   # conf.cxx do |cxx|
   #   cxx.command = CXX
-  #   cxx.flags = [
-  #     "-std=c++11",
+  #   cxx.flags += [
   #     "--sysroot=#{SYSROOT_PATH}",
   #     "--target=wasm32-wasi",
   #     # "-m32",
   #     # "-flto",
-  #     # "-O3",
-  #     # "-Wall",
-  #     # "-Wextra",
   #   ]
   #   cxx.defines += %w[
   #     MRB_USE_DEBUG_HOOK
@@ -90,12 +81,12 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
 
   conf.asm do |as|
     as.command = cxx_abi_enabled? ? CXX : CC
-    as.flags = ["-fno-integrated-as"]
+    as.flags += ["--target=wasm32-wasi"]
   end
 
   conf.linker do |linker|
     linker.command = LLD
-    linker.flags = [
+    linker.flags += [
       "-Wl,--lto-O3",
       "--verbose",
     ]
