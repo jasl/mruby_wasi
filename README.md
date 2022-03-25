@@ -28,7 +28,7 @@ Run `wasm-opt` (from Binaryen)
 
 ### Build without `Asyncify`
 
-> Ruby's exception will lead crash
+> It's only stubbed `setjmp & longjmp` so it will crash when Ruby's exception raised
 
 `rake`
 
@@ -60,8 +60,10 @@ See https://docs.wasmtime.dev/examples-debugging.html
 
 - https://eng-blog.iij.ad.jp/archives/10875
 - https://itnext.io/final-report-webassembly-wasi-support-in-ruby-4aface7d90c9
+  - https://github.com/Ruby/Ruby/pull/5407
   - https://github.com/ruby/ruby/tree/master/wasm
-- https://github.com/kripken/talks/blob/master/jmp.c
+- https://kripken.github.io/blog/wasm/2019/07/16/asyncify.html
+  - https://github.com/kripken/talks/blob/master/jmp.c
 
 ## License
 
