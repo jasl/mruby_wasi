@@ -49,7 +49,7 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
       "--sysroot=#{SYSROOT_PATH}",
       "--target=wasm32-wasi",
       "-m32",
-      "-flto",
+      # "-flto",
     ]
     cc.defines += %w[
       MRB_USE_DEBUG_HOOK
@@ -67,7 +67,7 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   #   cxx.flags += [
   #     "--sysroot=#{SYSROOT_PATH}",
   #     "--target=wasm32-wasi",
-  #     # "-m32",
+  #     "-m32",
   #     # "-flto",
   #   ]
   #   cxx.defines += %w[
@@ -87,7 +87,7 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   conf.linker do |linker|
     linker.command = LLD
     linker.flags += [
-      "-Wl,--lto-O3",
+      # "-Wl,--lto-O3",
       "--verbose",
     ]
   end
