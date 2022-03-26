@@ -10,4 +10,4 @@ tmp
 bin
 
 emsdk
-mruby_config.rb.lock
+build_config/*.rb.lock

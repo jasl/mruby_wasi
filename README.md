@@ -1,4 +1,4 @@
-mruby WASI
+WASI Mr.Engifar
 ====
 
 ## Requirements
@@ -46,7 +46,7 @@ Run `wasm-opt` (from Binaryen)
 
 > TODO: Copy executable to `bin` folder
 
-`wasmtime run mruby/build/wasm32-unknown-wasi/bin/mruby.wasm -- -e 'puts "Hello, mruby on WASI!"'`
+`wasmtime run mruby/build/wasm32-wasi/bin/mruby.wasm -- -e 'puts "Hello, mruby on WASI!"'`
 
 ## Limitation
 
@@ -67,4 +67,4 @@ See https://docs.wasmtime.dev/examples-debugging.html
 
 ## License
 
-mruby engine is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+Mr.Engifar is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).

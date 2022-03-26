@@ -2,7 +2,6 @@
 
 require "pathname"
 require "fileutils"
-require_relative "./flags"
 
 MRUBY_DIR = Pathname.new(__dir__).join("mruby")
 raise(<<-MESSAGE) unless Dir.exist?(MRUBY_DIR.join("src"))
@@ -17,23 +16,37 @@ raise(<<-MESSAGE) unless Dir.exist?(MRUBY_DIR.join("src"))
 MESSAGE
 
 PROJECT_ROOT = Pathname.new(__dir__)
-ROOT =
-  if ENV["TARGET_DIR"] && File.directory?(ENV["TARGET_DIR"])
-    Pathname.new(ENV["TARGET_DIR"])
-  elsif ENV["INSTALL_DIR"] && File.directory?(ENV["INSTALL_DIR"])
-    Pathname.new(ENV["INSTALL_DIR"])
+
+SUPPORTED_WASM_TARGETS = %w[wasi emscripten]
+WASM_TARGET =
+  if ENV["WASM_TARGET"]
+    if SUPPORTED_WASM_TARGETS.include? ENV["WASM_TARGET"].downcase
+      ENV["WASM_TARGET"].downcase
+    else
+      fail "Unknown WASM target: `#{ENV["WASM_TARGET"]}`, available #{SUPPORTED_WASM_TARGETS.join(", ")}"
+    end
   else
-    PROJECT_ROOT
+    :wasi
   end
 
-OUT_DIR = ROOT.join("bin")
+OUT_DIR =
+  if ENV["OUT_DIR"]
+    if File.directory?(ENV["OUT_DIR"])
+      Pathname.new(ENV["OUT_DIR"])
+    else
+      fail "`#{ENV["OUT_DIR"]}` not found or not a directory"
+    end
+  else
+    PROJECT_ROOT.join("bin")
+  end
+
 FileUtils.mkdir_p(OUT_DIR)
 OUT_WASM = OUT_DIR.join("mruby_engine.wasm").to_s
 
-MRUBY_BIN_DIR = MRUBY_DIR.join("build/host/bin")
-MRBC_EXE = MRUBY_BIN_DIR.join("mrbc")
+HOST_MRUBY_BIN_DIR = MRUBY_DIR.join("build/host/bin")
+HOST_MRBC_EXE = HOST_MRUBY_BIN_DIR.join("mrbc")
 
-MRUBY_LIB_DIR = MRUBY_DIR.join("build/wasm32-unknown-wasi/lib")
+MRUBY_LIB_DIR = MRUBY_DIR.join("build/wasm32-#{WASM_TARGET}/lib")
 MRUBY_LIB = MRUBY_LIB_DIR.join("libmruby.a")
 
 namespace(:mruby) do
@@ -41,7 +54,7 @@ namespace(:mruby) do
     Dir.chdir(MRUBY_DIR) do
       original_mruby_config = ENV["MRUBY_CONFIG"]
       begin
-        ENV["MRUBY_CONFIG"] = "../mruby_config.rb"
+        ENV["MRUBY_CONFIG"] = "../build_config/wasm32-#{WASM_TARGET}.rb"
         yield
       ensure
         ENV["MRUBY_CONFIG"] = original_mruby_config
@@ -59,7 +72,7 @@ namespace(:mruby) do
 
   task(:clean) do
     within_mruby do
-      sh("rm", "../mruby_config.rb.lock") if File.exist?("../mruby_config.rb.lock")
+      FileUtils.rm "../build_config/*.rb.lock"
       sh("ruby", "./minirake", "clean")
     end
   end

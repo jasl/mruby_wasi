@@ -10,7 +10,7 @@ CXX = WASI_SDK_PATH.join("bin", "clang++").realpath.to_s
 AR = WASI_SDK_PATH.join("bin", "llvm-ar").realpath.to_s
 LLD = WASI_SDK_PATH.join("bin", "clang").realpath.to_s
 
-PROJECT_ROOT_PATH = Pathname.new(__dir__)
+PROJECT_ROOT_PATH = Pathname.new(__dir__).parent
 GEMBOX =
   if ENV["MRUBY_ENGINE_GEMBOX_PATH"] && File.exist?(ENV["MRUBY_ENGINE_GEMBOX_PATH"])
     fail "`#{ENV['MRUBY_ENGINE_GEMBOX_PATH']}` require `.gembox` extension" unless ENV["MRUBY_ENGINE_GEMBOX_PATH"].end_with?(".gembox")
@@ -22,17 +22,33 @@ GEMBOX =
 
 ASYNCIFY = ENV["ASYNCIFY"].to_i == 1
 
+SHARD_COMPILER_FLAGS = [
+  "--sysroot=#{SYSROOT_PATH}",
+  "--target=wasm32-wasi",
+  "-fwasm-exceptions",
+  "-m32",
+  # "-flto",
+]
+
+SHARD_COMPILER_DEFINES = %w[
+  MRB_USE_DEBUG_HOOK
+  MRB_UTF8_STRING
+  MRB_WORD_BOXING
+  MRB_WORDBOX_NO_FLOAT_TRUNCATE
+  MRB_USE_RO_DATA_P_ETEXT
+]
+
 # https://github.com/mruby/mruby/blob/master/doc/guides/compile.md
 
-MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
+MRuby::CrossBuild.new("wasm32-wasi") do |conf|
   toolchain :clang
 
   conf.gembox GEMBOX
 
   if ASYNCIFY
-    conf.gem "mruby-wasi-asyncify-compilable"
+    conf.gem path: "../mruby-wasi-asyncify-compilable"
   else
-    conf.gem "mruby-wasi-compilable"
+    conf.gem path: "../mruby-wasi-compilable"
   end
 
   # Generate mruby commands
@@ -45,56 +61,27 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
 
   conf.cc do |cc|
     cc.command = cxx_abi_enabled? ? CXX : CC
-    cc.flags += [
-      "--sysroot=#{SYSROOT_PATH}",
-      "--target=wasm32-wasi",
-      "-m32",
-      # "-flto",
-    ]
-    cc.defines += %w[
-      MRB_USE_DEBUG_HOOK
-      MRB_UTF8_STRING
-      MRB_WORD_BOXING
-      MRB_WORDBOX_NO_FLOAT_TRUNCATE
-      MRB_USE_RO_DATA_P_ETEXT
-    ]
+    cc.flags += SHARD_COMPILER_FLAGS
+    cc.defines += SHARD_COMPILER_DEFINES
   end
 
   # conf.enable_cxx_abi
   # conf.disable_cxx_exception # WASI doesn't support C++ exception yet, so this must be enabled
   # conf.cxx do |cxx|
   #   cxx.command = CXX
-  #   cxx.flags += [
-  #     "--sysroot=#{SYSROOT_PATH}",
-  #     "--target=wasm32-wasi",
-  #     "-m32",
-  #     # "-flto",
-  #   ]
-  #   cxx.defines += %w[
-  #     MRB_USE_DEBUG_HOOK
-  #     MRB_UTF8_STRING
-  #     MRB_WORD_BOXING
-  #     MRB_WORDBOX_NO_FLOAT_TRUNCATE
-  #     MRB_USE_RO_DATA_P_ETEXT
-  #   ]
+  #   cxx.flags += SHARD_COMPILER_FLAGS
+  #   cxx.defines += SHARD_COMPILER_DEFINES
   # end
 
   conf.asm do |as|
     as.command = cxx_abi_enabled? ? CXX : CC
-    as.flags += ["--target=wasm32-wasi"]
-    as.defines += %w[
-      MRB_USE_DEBUG_HOOK
-      MRB_UTF8_STRING
-      MRB_WORD_BOXING
-      MRB_WORDBOX_NO_FLOAT_TRUNCATE
-      MRB_USE_RO_DATA_P_ETEXT
-    ]
+    as.flags += SHARD_COMPILER_FLAGS
+    as.defines += SHARD_COMPILER_FLAGS
   end
 
   conf.linker do |linker|
     linker.command = LLD
     linker.flags += [
-      # "-Wl,--lto-O3",
       "--verbose",
     ]
   end
@@ -110,20 +97,28 @@ MRuby::CrossBuild.new("wasm32-unknown-wasi") do |conf|
   end
 
   puts "================================================"
+  puts "WASI build config"
+  puts "================================================"
   puts "CC flags:"
   puts conf.cc.flags.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
+  puts
   puts "CC defines:"
   puts conf.cc.defines.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
+  puts
 
   puts "CXX flags:"
   puts conf.cxx.flags.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
+  puts
   puts "CXX defines:"
   puts conf.cxx.defines.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
+  puts
 
   puts "ASM flags:"
   puts conf.asm.flags.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
+  puts
   puts "ASM defines:"
   puts conf.asm.defines.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
+  puts
 
   puts "Linker flags:"
   puts conf.linker.flags.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
