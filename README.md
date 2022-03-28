@@ -29,7 +29,7 @@ Run `wasm-opt` (from Binaryen)
 
 `wasm-opt -g --asyncify -O3 --pass-arg=asyncify-ignore-imports -o bin/mruby.wasm mruby/build/wasm32-unknown-wasi/bin/mruby.wasm`
 
-> Disable optimization may get error `Invalid input WebAssembly code at offset 2464055: locals exceed`
+*Disable optimization may get error `Invalid input WebAssembly code at offset 2464055: locals exceed`*
 
 ### Build without `Asyncify`
 
