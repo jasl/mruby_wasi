@@ -1,18 +1,31 @@
 Mr.Engifar
 ====
 
-## Requirements
-
-- CRuby 2.6+
-- https://github.com/WebAssembly/wasi-sdk
-- https://github.com/WebAssembly/binaryen
+An experimental mruby script engine built on WASM.
+Expects to run both on Browser and Server-side.
 
 ## Build
+
+### Emscripten
+
+#### Preparation
+
+- CRuby 2.6+
+- https://emscripten.org/docs/getting_started/downloads.html#installation-instructions-using-the-emsdk-recommended
+
+#### Build
+
+`WASM_TARGET=emscripten rake`
 
 ### WASI
 
 > Because of WASI lacking exception-handling or setjmp/longjmp support, it's unusable at this time.
 
+#### Preparation
+
+- CRuby 2.6+
+- https://github.com/WebAssembly/wasi-sdk
+- https://github.com/WebAssembly/binaryen
 - You must set `WASI_SDK_PATH` env
   - e.g. `export WASI_SDK_PATH="~/opt/wasi-sdk-14.0"`
 - You may need run `rake mrproper` before switching build
