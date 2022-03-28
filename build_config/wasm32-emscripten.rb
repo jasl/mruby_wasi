@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
-require "pathname"
+require 'mkmf'
 
-WASI_SDK_PATH = Pathname.new(File.expand_path(ENV['WASI_SDK_PATH'] || fail('Specify WASI_SDK_PATH environment variable!')))
-SYSROOT_PATH = WASI_SDK_PATH.join("share", "wasi-sysroot").realpath.to_s
+CC = find_executable("emcc")
+fail "`emcc` not found" unless CC
 
-CC = WASI_SDK_PATH.join("bin", "clang").realpath.to_s
-CXX = WASI_SDK_PATH.join("bin", "clang++").realpath.to_s
-AR = WASI_SDK_PATH.join("bin", "llvm-ar").realpath.to_s
+CXX = find_executable("em++")
+fail "`em++` not found" unless CXX
+
+AR = find_executable("emar")
+fail "`emar` not found" unless AR
 
 PROJECT_ROOT_PATH = Pathname.new(__dir__).parent
 GEMBOX =
@@ -19,12 +21,9 @@ GEMBOX =
     PROJECT_ROOT_PATH.join("mruby_engine")
   end
 
-ASYNCIFY = ENV["ASYNCIFY"].to_i == 1
-
 SHARD_COMPILER_FLAGS = [
-  "--sysroot=#{SYSROOT_PATH}",
-  "--target=wasm32-wasi",
-  "-fwasm-exceptions",
+  "-fexceptions",
+  # "-fwasm-exceptions", # Use WASM EH, but most of VM not support it ATM
   "-m32",
   # "-flto",
 ]
@@ -39,22 +38,17 @@ SHARD_COMPILER_DEFINES = %w[
 ]
 
 LINKER_FLAGS = [
-  "-fwasm-exceptions",
+  "-fexceptions",
+  # "-fwasm-exceptions", # Use WASM EH, but most of VM not support it ATM
   "-m32"
 ]
 
 # https://github.com/mruby/mruby/blob/master/doc/guides/compile.md
 
-MRuby::CrossBuild.new("wasm32-wasi") do |conf|
+MRuby::CrossBuild.new("wasm32-emscripten") do |conf|
   toolchain :clang
 
   conf.gembox GEMBOX
-
-  if ASYNCIFY
-    conf.gem path: "../mruby-wasi-asyncify-compilable"
-  else
-    conf.gem path: "../mruby-wasi-compilable"
-  end
 
   # TODO: Remove this
   conf.gem core: "mruby-bin-mruby"
@@ -69,13 +63,12 @@ MRuby::CrossBuild.new("wasm32-wasi") do |conf|
     cc.defines += SHARD_COMPILER_DEFINES
   end
 
-  # conf.enable_cxx_abi
-  # conf.disable_cxx_exception # WASI doesn't support C++ exception yet, so this must be enabled
-  # conf.cxx do |cxx|
-  #   cxx.command = CXX
-  #   cxx.flags += SHARD_COMPILER_FLAGS
-  #   cxx.defines += SHARD_COMPILER_DEFINES
-  # end
+  conf.enable_cxx_abi
+  conf.cxx do |cxx|
+    cxx.command = CXX
+    cxx.flags += SHARD_COMPILER_FLAGS
+    cxx.defines += SHARD_COMPILER_DEFINES
+  end
 
   conf.asm do |as|
     as.command = cxx_abi_enabled? ? CXX : CC
@@ -99,7 +92,7 @@ MRuby::CrossBuild.new("wasm32-wasi") do |conf|
   end
 
   puts "================================================"
-  puts "WASI build config"
+  puts "Emscripten build config"
   puts "================================================"
   puts "CC flags:"
   puts conf.cc.flags.flatten.reject { |s| s.to_s.size.zero? }.join(", ")
