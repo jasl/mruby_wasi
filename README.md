@@ -1,8 +1,10 @@
 Mr.Engifar
 ====
 
+> Building...
+
 An experimental mruby script engine built on WASM.
-Expects to run both on Browser and Server-side.
+Expects to run both on Browser and Server-side and offer affordable performance.
 
 ## Build
 
