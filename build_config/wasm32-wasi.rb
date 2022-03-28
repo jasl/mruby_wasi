@@ -20,12 +20,17 @@ GEMBOX =
   end
 
 ASYNCIFY = ENV["ASYNCIFY"].to_i == 1
+PRODUCTION = ENV["PRODUCTION"].to_i == 1
 
 SHARD_COMPILER_FLAGS = [
   "--sysroot=#{SYSROOT_PATH}",
   "--target=wasm32-wasi",
   "-fwasm-exceptions",
   "-m32",
+  # "-flto",
+]
+
+SHARD_OPTIMIZATION_COMPILER_FLAGS = [
   # "-flto",
 ]
 
@@ -43,6 +48,8 @@ LINKER_FLAGS = [
   "-m32"
 ]
 
+OPTIMIZATION_LINKER_FLAGS = []
+
 # https://github.com/mruby/mruby/blob/master/doc/guides/compile.md
 
 MRuby::CrossBuild.new("wasm32-wasi") do |conf|
@@ -59,13 +66,12 @@ MRuby::CrossBuild.new("wasm32-wasi") do |conf|
   # TODO: Remove this
   conf.gem core: "mruby-bin-mruby"
 
-  # Turn on `enable_debug` for better debugging
-  conf.enable_debug
-  # conf.enable_test
+  conf.enable_debug unless PRODUCTION
 
   conf.cc do |cc|
     cc.command = cxx_abi_enabled? ? CXX : CC
     cc.flags += SHARD_COMPILER_FLAGS
+    cc.flags += SHARD_OPTIMIZATION_COMPILER_FLAGS unless debug_enabled?
     cc.defines += SHARD_COMPILER_DEFINES
   end
 
@@ -74,18 +80,21 @@ MRuby::CrossBuild.new("wasm32-wasi") do |conf|
   # conf.cxx do |cxx|
   #   cxx.command = CXX
   #   cxx.flags += SHARD_COMPILER_FLAGS
+  #   cxx.flags += SHARD_OPTIMIZATION_COMPILER_FLAGS unless debug_enabled?
   #   cxx.defines += SHARD_COMPILER_DEFINES
   # end
 
   conf.asm do |as|
     as.command = cxx_abi_enabled? ? CXX : CC
     as.flags += SHARD_COMPILER_FLAGS
+    as.flags += SHARD_OPTIMIZATION_COMPILER_FLAGS unless debug_enabled?
     as.defines += SHARD_COMPILER_FLAGS
   end
 
   conf.linker do |linker|
     linker.command = cxx_abi_enabled? ? CXX : CC
     linker.flags += LINKER_FLAGS
+    linker.flags += OPTIMIZATION_LINKER_FLAGS unless debug_enabled?
   end
 
   conf.archiver do |archiver|
