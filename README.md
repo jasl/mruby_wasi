@@ -13,7 +13,8 @@ Expects to run both on Browser and Server-side and offer affordable performance.
 #### Preparation
 
 - CRuby 2.6+
-- https://emscripten.org/docs/getting_started/downloads.html#installation-instructions-using-the-emsdk-recommended
+- `emcc`, `em++` and `emar` available
+  - [Installation instructions using the emsdk](https://emscripten.org/docs/getting_started/downloads.html#installation-instructions-using-the-emsdk-recommended)
 
 #### Build
 
