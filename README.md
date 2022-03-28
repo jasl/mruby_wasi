@@ -1,4 +1,4 @@
-WASI Mr.Engifar
+Mr.Engifar
 ====
 
 ## Requirements
@@ -9,12 +9,17 @@ WASI Mr.Engifar
 
 ## Build
 
+### WASI
+
+> Because of WASI lacking exception-handling or setjmp/longjmp support, it's unusable at this time.
+
 - You must set `WASI_SDK_PATH` env
   - e.g. `export WASI_SDK_PATH="~/opt/wasi-sdk-14.0"`
 - You may need run `rake mrproper` before switching build
-- Don't forget `git submodule update --init` to fetch submodules
 
-### Build with `Asyncify`
+#### Build with `Asyncify`
+
+> It's broken, because I'm not understand how to integrate Asyncify
 
 Build mruby
 
@@ -34,27 +39,7 @@ Run `wasm-opt` (from Binaryen)
 
 ## Play
 
-> First time run may take minutes
-
-### if build with `Asyncify`
-
-> TODO: Weird there's no output
-
-`wasmtime run bin/mruby.wasm -- -e 'puts "Hello, mruby on WASI!"'`
-
-### if build without `Asyncify`
-
-> TODO: Copy executable to `bin` folder
-
-`wasmtime run mruby/build/wasm32-wasi/bin/mruby.wasm -- -e 'puts "Hello, mruby on WASI!"'`
-
-## Limitation
-
-- `enable_cxx_exception` will fail because WASI lacking C++ exception support
-
-## Debugging
-
-See https://docs.wasmtime.dev/examples-debugging.html
+TODO
 
 ## References
 

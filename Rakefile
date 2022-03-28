@@ -13,6 +13,10 @@ raise(<<-MESSAGE) unless Dir.exist?(MRUBY_DIR.join("src"))
     $ git submodule init
     $ git submodule update
 
+  or:
+
+    $ git submodule update --init
+
 MESSAGE
 
 PROJECT_ROOT = Pathname.new(__dir__)
