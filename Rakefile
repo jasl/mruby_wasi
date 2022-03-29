@@ -30,7 +30,7 @@ WASM_TARGET =
       fail "Unknown WASM target: `#{ENV["WASM_TARGET"]}`, available #{SUPPORTED_WASM_TARGETS.join(", ")}"
     end
   else
-    :wasi
+    "emscripten"
   end
 
 OUT_DIR =
