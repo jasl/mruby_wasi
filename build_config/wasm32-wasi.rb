@@ -58,9 +58,9 @@ MRuby::CrossBuild.new("wasm32-wasi") do |conf|
   conf.gembox GEMBOX
 
   if ASYNCIFY
-    conf.gem path: "../mruby-wasi-asyncify-compilable"
+    conf.gem path: "../mruby-wasi-asyncify-build-pack"
   else
-    conf.gem path: "../mruby-wasi-compilable"
+    conf.gem path: "../mruby-wasi-build-pack"
   end
 
   # TODO: Remove this
