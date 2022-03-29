@@ -27,11 +27,18 @@ SHARD_COMPILER_FLAGS = [
   "--target=wasm32-wasi",
   "-fwasm-exceptions",
   "-m32",
-  # "-flto",
 ]
 
 SHARD_OPTIMIZATION_COMPILER_FLAGS = [
   # "-flto",
+]
+
+CC_COMPILER_FLAGS = [
+  # "--std=c99",
+]
+
+CXX_COMPILER_FLAGS = [
+  # "--std=c++11",
 ]
 
 SHARD_COMPILER_DEFINES = %w[
@@ -72,6 +79,7 @@ MRuby::CrossBuild.new("wasm32-wasi") do |conf|
     cc.command = cxx_abi_enabled? ? CXX : CC
     cc.flags += SHARD_COMPILER_FLAGS
     cc.flags += SHARD_OPTIMIZATION_COMPILER_FLAGS unless debug_enabled?
+    cc.flags += CC_COMPILER_FLAGS
     cc.defines += SHARD_COMPILER_DEFINES
   end
 
@@ -81,6 +89,7 @@ MRuby::CrossBuild.new("wasm32-wasi") do |conf|
   #   cxx.command = CXX
   #   cxx.flags += SHARD_COMPILER_FLAGS
   #   cxx.flags += SHARD_OPTIMIZATION_COMPILER_FLAGS unless debug_enabled?
+  #   cxx.flags += CXX_COMPILER_FLAGS
   #   cxx.defines += SHARD_COMPILER_DEFINES
   # end
 
